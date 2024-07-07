@@ -1,0 +1,23 @@
+{
+  "class" : "testClassName",
+  "description" : "This is a test class",
+  "multiTenancyConfig" : {
+    "autoTenantCreation" : true,
+    "enabled" : true
+  },
+  "properties" :
+    [
+      {
+        "name" : "answer",
+        "dataType" : ["text"]
+      },
+      {
+        "name" : "question",
+        "dataType" : ["text"]
+      },
+      {
+        "name": "category",
+        "dataType" : ["text"]
+      }
+    ]
+}

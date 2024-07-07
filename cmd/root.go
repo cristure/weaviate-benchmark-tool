@@ -8,18 +8,20 @@ import (
 
 	"github.com/cristure/weaviate-benchmark-tool/cmd/add"
 	"github.com/cristure/weaviate-benchmark-tool/cmd/config"
+	"github.com/cristure/weaviate-benchmark-tool/cmd/generate"
+	"github.com/cristure/weaviate-benchmark-tool/cmd/list"
 )
 
 func init() {
 	initRootCommand()
-	//initRandomText()
-	//initDataset()
 }
 
 func initRootCommand() {
 	RootCmd.PersistentFlags().StringVarP(&config.GlobalConfig.Host, "host", "H", "localhost", "Host to connect to")
 	RootCmd.PersistentFlags().StringVarP(&config.GlobalConfig.Scheme, "scheme", "S", "http", "Schme to connect to")
 	RootCmd.AddCommand(add.AddCmd)
+	RootCmd.AddCommand(generate.GenerateCmd)
+	RootCmd.AddCommand(list.ListCmd)
 }
 
 var RootCmd = &cobra.Command{

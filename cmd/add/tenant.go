@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/weaviate/weaviate/entities/models"
@@ -12,47 +13,36 @@ import (
 )
 
 var (
-	collectionName string
-	tenantsNo      int
+	className  string
+	tenantName string
 )
 
 func init() {
-	tenantCmd.PersistentFlags().StringVarP(&collectionName, "name", "N", "", "Name of the collection to add to")
-	tenantCmd.PersistentFlags().IntVarP(&tenantsNo, "tenants-number", "T", 1, "Number of the tenants to add")
+	tenantCmd.PersistentFlags().StringVarP(&className, "class", "c", "", "Name of the class to add the tenant to")
+	tenantCmd.PersistentFlags().StringVarP(&tenantName, "name", "n", "", "Name of the tenant to add")
+	tenantCmd.MarkPersistentFlagRequired("class-name")
+	tenantCmd.MarkPersistentFlagRequired("name")
 }
 
 var tenantCmd = &cobra.Command{
 	Use:   "tenant",
 	Short: "Add tenants",
-	Long:  `Add a specified amount of tenants to a collection`,
+	Long:  `Add only a tenant to a given class`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, err := client.New()
 		if err != nil {
 			return fmt.Errorf("failed to init client: %w", err)
 		}
 
-		if collectionName == "" {
-			return fmt.Errorf("must specify collection name")
-		}
-
-		// Add the class to the schema
+		before := time.Now()
 		err = c.Schema().TenantsCreator().
-			WithClassName(collectionName).
-			WithTenants(generateTenants()...).
+			WithClassName(className).
+			WithTenants(models.Tenant{Name: tenantName}).
 			Do(context.Background())
 
-		fmt.Fprintf(os.Stdout, "Tenants have been added successfully to collection (%s)", collectionName)
+		took := time.Since(before)
+
+		fmt.Fprintf(os.Stdout, "Tenant (%s) has been created in %s", tenantName, took)
 		return nil
 	},
-}
-
-func generateTenants() []models.Tenant {
-	tenants := make([]models.Tenant, tenantsNo)
-	for i := 0; i < tenantsNo; i++ {
-		tenants[i] = models.Tenant{
-			Name: fmt.Sprintf("tenant%d", i),
-		}
-	}
-
-	return tenants
 }
